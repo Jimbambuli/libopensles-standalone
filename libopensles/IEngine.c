@@ -158,7 +158,7 @@ static SLresult IEngine_CreateAudioPlayer(SLEngineItf self, SLObjectItf *pPlayer
 
                     switch (this->mDataSource.mLocator.mLocatorType) {
                     case SL_DATALOCATOR_BUFFERQUEUE:
-#ifdef ANDROID
+#ifdef ANDROID_EXT
                     case SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE:
 #endif
                         this->mBufferQueue.mNumBuffers =

@@ -16,8 +16,13 @@
 
 /** \file sles_allinclusive.h Everything including the kitchen sink */
 
-#include "SLES/OpenSLES.h"
+// always compile android extensions on android
 #ifdef ANDROID
+#define ANDROID_EXT
+#endif
+
+#include "SLES/OpenSLES.h"
+#ifdef ANDROID_EXT
 #include "SLES/OpenSLES_Android.h"
 #endif
 #include <stddef.h> // offsetof

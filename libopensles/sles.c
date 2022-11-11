@@ -272,7 +272,7 @@ static SLresult checkDataLocator(void *pLocator, DataLocator *pDataLocator)
         break;
 
     case SL_DATALOCATOR_BUFFERQUEUE:
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     // This is an alias that is _not_ converted; the rest of the code must check for both locator
     // types. That's because it is only an alias for audio players, not audio recorder objects
     // so we have to remember the distinction.
@@ -656,7 +656,7 @@ SLresult checkSourceFormatVsInterfacesCompatibility(const DataLocatorFormat *pDa
     SLuint32 i;
     switch (pDataLocatorFormat->mLocator.mLocatorType) {
     case SL_DATALOCATOR_BUFFERQUEUE:
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     case SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE:
 #endif
         for (i = 0; i < numInterfaces; i++) {
@@ -717,7 +717,7 @@ SLresult checkDataSource(const SLDataSource *pDataSrc, DataLocatorFormat *pDataL
     case SL_DATALOCATOR_ADDRESS:
     case SL_DATALOCATOR_BUFFERQUEUE:
     case SL_DATALOCATOR_MIDIBUFFERQUEUE:
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     case SL_DATALOCATOR_ANDROIDFD:
     case SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE:
 #endif
@@ -774,14 +774,14 @@ SLresult checkDataSink(const SLDataSink *pDataSink, DataLocatorFormat *pDataLoca
         break;
 
     case SL_DATALOCATOR_BUFFERQUEUE:
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     case SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE:
 #endif
         if (SL_OBJECTID_AUDIOPLAYER == objType) {
             SL_LOGE("buffer queue can't be used as data sink for audio player");
             result = SL_RESULT_PARAMETER_INVALID;
         } else if (SL_OBJECTID_AUDIORECORDER == objType) {
-#ifdef ANDROID
+#ifdef ANDROID_EXT
             if (SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE !=
                 pDataLocatorFormat->mLocator.mLocatorType) {
                 SL_LOGE("audio recorder source locator must be SL_DATALOCATOR_ANDROIDBUFFERQUEUE");
