@@ -72,7 +72,7 @@ typedef struct COutputMix_struct COutputMix;
 #endif // USE_SNDFILE
 
 #ifdef USE_SDL
-#include <SDL/SDL_audio.h>
+#include <SDL_audio.h>
 #endif // USE_SDL
 
 #ifdef ANDROID
