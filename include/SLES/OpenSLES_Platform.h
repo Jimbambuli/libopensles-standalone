@@ -33,13 +33,15 @@
 #ifndef _OPENSLES_PLATFORM_H_
 #define _OPENSLES_PLATFORM_H_
 
-typedef unsigned char               sl_uint8_t;
-typedef signed char                 sl_int8_t;
-typedef unsigned short              sl_uint16_t;
-typedef signed short                sl_int16_t;
-typedef unsigned long               sl_uint32_t;
-typedef signed long                 sl_int32_t;
-typedef long long                   sl_int64_t;
+#include <stdint.h>
+
+typedef uint8_t               sl_uint8_t;
+typedef int8_t                sl_int8_t;
+typedef uint16_t              sl_uint16_t;
+typedef int16_t               sl_int16_t;
+typedef uint32_t              sl_uint32_t;
+typedef int32_t               sl_int32_t;
+typedef int64_t               sl_int64_t;
 
 #ifndef SLAPIENTRY
 #ifdef __GNUC__
