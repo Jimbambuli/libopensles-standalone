@@ -365,9 +365,19 @@ SLresult IOutputMixExt_checkAudioPlayerSourceSink(CAudioPlayer *this)
         switch (this->mDataSource.mFormat.mFormatType) {
         case SL_DATAFORMAT_PCM:
 #ifdef USE_SDL
-            // SDL is hard-coded to 44.1 kHz, and there is no sample rate converter
-            if (SL_SAMPLINGRATE_8 != this->mDataSource.mFormat.mPCM.samplesPerSec)
+            // SDL is hard-coded to 44.1 kHz (or SLES_SDL_FREQ) at startup, and there is no sample rate converter
+            char *freq_override = getenv("SLES_SDL_FREQ");
+            int freq;
+            if(freq_override)
+                freq = atoi(freq_override) * 1000; // kHz to Hz
+			else
+                freq = SL_SAMPLINGRATE_44_1;
+
+            if (freq != this->mDataSource.mFormat.mPCM.samplesPerSec) {
+                SL_LOGE("OpenSLES SDL backend in use, so can't convert content with sample rate of %d to sample rate %d\n"
+                        "if this is the only sample rate used by this app, you can set SLES_SDL_FREQ to the required sample rate in kHz to work around this limitation\n", this->mDataSource.mFormat.mPCM.samplesPerSec, freq);
                 return SL_RESULT_CONTENT_UNSUPPORTED;
+            }
 #endif
             break;
         default:

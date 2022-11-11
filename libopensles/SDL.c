@@ -45,7 +45,15 @@ static void SDLCALL SDL_callback(void *context, Uint8 *stream, int len)
 void SDL_open(IEngine *thisEngine)
 {
     SDL_AudioSpec fmt;
-    fmt.freq = 44100;
+	char *freq_override = getenv("SLES_SDL_FREQ");
+	if(freq_override) {
+		int freq = atoi(freq_override);
+		SL_LOGI("SLES_SDL_FREQ provided; using sample frequency of %d kHz\n", freq);
+	    fmt.freq = freq;
+	}
+	else {
+	    fmt.freq = 44100;
+	}
     fmt.format = AUDIO_S16;
     fmt.channels = STEREO_CHANNELS;
 #ifdef _WIN32 // FIXME Either a bug or a serious misunderstanding
