@@ -41,5 +41,6 @@ libopensles = shared_library(
 		'-DUSE_BACKPORT', # gets rid of dependencies on some stuff from AOSP
 
 		'-Wno-multichar'
-	]
+	],
+	install: true,
 )
