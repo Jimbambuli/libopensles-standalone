@@ -253,7 +253,7 @@ static SLresult IEngine_CreateAudioRecorder(SLEngineItf self, SLObjectItf *pReco
 {
     SL_ENTER_INTERFACE
 
-#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID)
+#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID_EXT)
     if (NULL == pRecorder) {
         result = SL_RESULT_PARAMETER_INVALID;
     } else {

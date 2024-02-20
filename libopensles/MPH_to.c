@@ -163,7 +163,7 @@ const signed char MPH_to_AudioPlayer[MPH_MAX] = {
 #endif
 };
 
-#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID)
+#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID_EXT)
 const signed char MPH_to_AudioRecorder[MPH_MAX] = {
 #ifdef USE_DESIGNATED_INITIALIZERS
     [0 ... MPH_MAX-1] = -1,

@@ -110,7 +110,7 @@ static const ClassTable CAudioPlayer_class = {
 };
 
 
-#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID)
+#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID_EXT)
 
 // AudioRecorder class
 
@@ -403,7 +403,7 @@ static const ClassTable * const classes[] = {
     NULL,
 #endif
     &CAudioPlayer_class,
-#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID)
+#if (USE_PROFILES & USE_PROFILES_OPTIONAL) || defined(ANDROID_EXT)
     &CAudioRecorder_class,
 #else
     NULL,

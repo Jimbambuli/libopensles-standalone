@@ -12,6 +12,7 @@ opensles_helper = static_library(
 		'MPH_to.c'
 	],
 	c_args: [
+		'-DANDROID_EXT',
 		'-Wno-override-init',
 		'-Wno-missing-field-initializers'
 	]
