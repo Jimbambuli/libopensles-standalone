@@ -16,6 +16,8 @@
 
 /* EffectSend implementation */
 
+#include <inttypes.h>
+
 #include "sles_allinclusive.h"
 
 
@@ -83,7 +85,7 @@ static struct EnableLevel *getEnableLevel(IEffectSend *this, const void *pAuxEff
         SL_LOGE("EffectSend no GetInterface yet");
         break;
     default:
-        SL_LOGE("EffectSend invalid interface state %lu", state);
+        SL_LOGE("EffectSend invalid interface state %"PRIu32, state);
         break;
     }
     return NULL;

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <inttypes.h>
+
 /* OpenSL ES private and global functions not associated with an interface or class */
 
 #include "sles_allinclusive.h"
@@ -74,11 +76,11 @@ SLresult AcquireStrongRef(IObject *object, SLuint32 expectedObjectID)
     object_lock_exclusive(object);
     SLuint32 actualObjectID = IObjectToObjectID(object);
     if (expectedObjectID != actualObjectID) {
-        SL_LOGE("object %p has object ID %lu but expected %lu", object, actualObjectID,
+        SL_LOGE("object %p has object ID %"PRIu32" but expected %"PRIu32, object, actualObjectID,
             expectedObjectID);
         result = SL_RESULT_PARAMETER_INVALID;
     } else if (SL_OBJECT_STATE_REALIZED != object->mState) {
-        SL_LOGE("object %p with object ID %lu is not realized", object, actualObjectID);
+        SL_LOGE("object %p with object ID %"PRIu32" is not realized", object, actualObjectID);
         result = SL_RESULT_PRECONDITIONS_VIOLATED;
     } else {
         ++object->mStrongRefCount;
@@ -187,7 +189,7 @@ SLresult checkInterfaces(const ClassTable *class__, SLuint32 numInterfaces,
                 // Here if interface was not found, or is not available for this object type
                 if (pInterfaceRequired[i]) {
                     // Application said it required the interface, so give up
-                    SL_LOGE("class %s interface %lu required but unavailable MPH=%d",
+                    SL_LOGE("class %s interface %"PRIu32" required but unavailable MPH=%d",
                             class__->mName, i, MPH);
                     return SL_RESULT_FEATURE_UNSUPPORTED;
                 }
@@ -307,7 +309,7 @@ static SLresult checkDataLocator(void *pLocator, DataLocator *pDataLocator)
             // worse yet, an SL_IODEVICE enum constant for audio output does not exist yet
             // case SL_IODEVICE_AUDIOOUTPUT:
             default:
-                SL_LOGE("invalid deviceType %lu", deviceType);
+                SL_LOGE("invalid deviceType %"PRIu32, deviceType);
                 pDataLocator->mIODevice.device = NULL;
                 return SL_RESULT_PARAMETER_INVALID;
             }
@@ -325,24 +327,24 @@ static SLresult checkDataLocator(void *pLocator, DataLocator *pDataLocator)
             switch (deviceType) {
             case SL_IODEVICE_LEDARRAY:
                 if (SL_DEFAULTDEVICEID_LED != deviceID) {
-                    SL_LOGE("invalid LED deviceID %lu", deviceID);
+                    SL_LOGE("invalid LED deviceID %"PRIu32, deviceID);
                     return SL_RESULT_PARAMETER_INVALID;
                 }
                 break;
             case SL_IODEVICE_VIBRA:
                 if (SL_DEFAULTDEVICEID_VIBRA != deviceID) {
-                    SL_LOGE("invalid vibra deviceID %lu", deviceID);
+                    SL_LOGE("invalid vibra deviceID %"PRIu32, deviceID);
                     return SL_RESULT_PARAMETER_INVALID;
                 }
                 break;
             case SL_IODEVICE_AUDIOINPUT:
                 if (SL_DEFAULTDEVICEID_AUDIOINPUT != deviceID) {
-                    SL_LOGE("invalid audio input deviceID %lu", deviceID);
+                    SL_LOGE("invalid audio input deviceID %"PRIu32, deviceID);
                     return SL_RESULT_PARAMETER_INVALID;
                 }
                 break;
             default:
-                SL_LOGE("invalid deviceType %lu", deviceType);
+                SL_LOGE("invalid deviceType %"PRIu32, deviceType);
                 return SL_RESULT_PARAMETER_INVALID;
             }
         }
@@ -418,7 +420,7 @@ static SLresult checkDataLocator(void *pLocator, DataLocator *pDataLocator)
 #endif
 
     default:
-        SL_LOGE("invalid locatorType %lu", locatorType);
+        SL_LOGE("invalid locatorType %"PRIu32, locatorType);
         return SL_RESULT_PARAMETER_INVALID;
     }
 
@@ -582,7 +584,7 @@ static SLresult checkDataFormat(void *pFormat, DataFormat *pDataFormat)
                     break;
                 }
                 if (SL_RESULT_SUCCESS != result) {
-                    SL_LOGE("channelMask=0x%lx numChannels=%lu", pDataFormat->mPCM.channelMask,
+                    SL_LOGE("channelMask=0x%"PRIx32" numChannels=%"PRIu32, pDataFormat->mPCM.channelMask,
                         pDataFormat->mPCM.numChannels);
                     break;
                 }
@@ -1087,7 +1089,7 @@ SLresult SLAPIENTRY slCreateEngine(SLObjectItf *pEngine, SLuint32 numOptions,
         *pEngine = NULL;
 
         if ((0 < numOptions) && (NULL == pEngineOptions)) {
-            SL_LOGE("numOptions=%lu and pEngineOptions=NULL", numOptions);
+            SL_LOGE("numOptions=%"PRIu32" and pEngineOptions=NULL", numOptions);
             result = SL_RESULT_PARAMETER_INVALID;
             break;
         }
@@ -1109,7 +1111,7 @@ SLresult SLAPIENTRY slCreateEngine(SLObjectItf *pEngine, SLuint32 numOptions,
                 lossOfControlGlobal = SL_BOOLEAN_FALSE != (SLboolean) option->data; // normalize
                 break;
             default:
-                SL_LOGE("unknown engine option: feature=%lu data=%lu",
+                SL_LOGE("unknown engine option: feature=%"PRIu32" data=%"PRIu32,
                     option->feature, option->data);
                 result = SL_RESULT_PARAMETER_INVALID;
                 break;

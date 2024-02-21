@@ -40,7 +40,12 @@ libopensles = shared_library(
 		'-DUSE_SNDFILE', # used by the SDL backend
 		'-DUSE_BACKPORT', # gets rid of dependencies on some stuff from AOSP
 
-		'-Wno-multichar'
+		'-Wall',
+		'-Wextra',
+		'-Wno-multichar',
+		'-Wno-implicit-fallthrough',
+		'-Wno-type-limits',
+		'-Wno-unused-parameter'
 	],
 	install: true,
 )

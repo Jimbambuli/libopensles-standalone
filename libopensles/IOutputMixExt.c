@@ -367,7 +367,7 @@ SLresult IOutputMixExt_checkAudioPlayerSourceSink(CAudioPlayer *this)
 #ifdef USE_SDL
             // SDL is hard-coded to 44.1 kHz (or SLES_SDL_FREQ) at startup, and there is no sample rate converter
             char *freq_override = getenv("SLES_SDL_FREQ");
-            int freq;
+            SLuint32 freq;
             if(freq_override)
                 freq = atoi(freq_override) * 1000; // kHz to Hz
 			else
