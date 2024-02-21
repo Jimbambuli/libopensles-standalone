@@ -37,6 +37,7 @@ libopensles_files = files([
 	'CEngine.c',
 	'COutputMix.c',
 	'IOutputMixExt.c',
+	'IAndroidConfiguration.c',
 	'IBassBoost.c',
 	'IBufferQueue.c',
 	'IEffectSend.c',

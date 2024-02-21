@@ -926,8 +926,11 @@ extern void
 #define IVibra_init     NULL
 #endif
 
-#ifndef ANDROID
+#ifndef ANDROID_EXT
 #define IAndroidConfiguration_init      NULL
+#endif
+
+#ifndef ANDROID
 #define IAndroidEffect_init             NULL
 #define IAndroidEffectCapabilities_init NULL
 #define IAndroidEffectSend_init         NULL

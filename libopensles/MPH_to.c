@@ -75,12 +75,14 @@ const signed char MPH_to_AudioPlayer[MPH_MAX] = {
     [MPH_PLAYBACKRATE] = 23,
     [MPH_VIRTUALIZER] = 24,
     [MPH_VISUALIZATION] = 25,
-#ifdef ANDROID
+#if defined(ANDROID)
     [MPH_ANDROIDEFFECT] = 26,
     [MPH_ANDROIDEFFECTSEND] = 27,
     [MPH_ANDROIDCONFIGURATION] = 28,
+#elif defined(ANDROID_EXT)
+    [MPH_ANDROIDCONFIGURATION] = 26,
 #endif
-#ifdef ANDROID_EXT
+#if defined(ANDROID_EXT)
     [MPH_ANDROIDSIMPLEBUFFERQUEUE] = 7  // alias for [MPH_BUFFERQUEUE]
 #endif
 };

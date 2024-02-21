@@ -30,7 +30,9 @@ static SLresult IAndroidConfiguration_SetConfiguration(SLAndroidConfigurationItf
 
     interface_lock_exclusive(this);
 
-    // route configuration to the appropriate object
+    SL_LOGE("IAndroidConfiguration_SetConfiguration: STUB");
+    result = SL_RESULT_SUCCESS; // FIXME
+/*    // route configuration to the appropriate object
     if (SL_OBJECTID_AUDIORECORDER == IObjectToObjectID((this)->mThis)) {
         SL_LOGV("SetConfiguration issued for AudioRecorder key=%s valueSize=%lu",
                 configKey, valueSize);
@@ -44,7 +46,7 @@ static SLresult IAndroidConfiguration_SetConfiguration(SLAndroidConfigurationItf
     } else {
         result = SL_RESULT_PARAMETER_INVALID;
     }
-
+*/
     interface_unlock_exclusive(this);
 
     SL_LEAVE_INTERFACE
@@ -67,8 +69,10 @@ static SLresult IAndroidConfiguration_GetConfiguration(SLAndroidConfigurationItf
 
         interface_lock_exclusive(this);
 
+        SL_LOGE("IAndroidConfiguration_GetConfiguration: STUB");
+        result = SL_RESULT_SUCCESS; // FIXME
         // route configuration request to the appropriate object
-        if (SL_OBJECTID_AUDIORECORDER == IObjectToObjectID((this)->mThis)) {
+/*        if (SL_OBJECTID_AUDIORECORDER == IObjectToObjectID((this)->mThis)) {
             result = android_audioRecorder_getConfig((CAudioRecorder *) this->mThis, configKey,
                     pValueSize, pConfigValue);
         } else if (SL_OBJECTID_AUDIOPLAYER == IObjectToObjectID((this)->mThis)) {
@@ -77,7 +81,7 @@ static SLresult IAndroidConfiguration_GetConfiguration(SLAndroidConfigurationItf
         } else {
             result = SL_RESULT_PARAMETER_INVALID;
         }
-
+*/
         interface_unlock_exclusive(this);
     }
 

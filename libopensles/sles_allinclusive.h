@@ -857,6 +857,13 @@ typedef struct /*Volume_interface*/ {
     unsigned mMemberMask;   // set of member objects
 } /*C3DGroup*/;
 
+#ifdef ANDROID_EXT
+typedef struct {
+    const struct SLAndroidConfigurationItf_ *mItf;
+    IObject *mThis;
+} IAndroidConfiguration;
+#endif
+
 #ifdef ANDROID
 
 // FIXME Move these into the I... section above
@@ -881,11 +888,6 @@ typedef struct {
     SLboolean mEnabled;
     SLmillibel mSendLevel; //android::KeyedVector<SLuint32, SLmillibel> mSendLevels;
 } IAndroidEffectSend;
-
-typedef struct {
-    const struct SLAndroidConfigurationItf_ *mItf;
-    IObject *mThis;
-} IAndroidConfiguration;
 
 #if defined(ANDROID) && !defined(USE_BACKPORT)
 // FIXME this include is done here so the effect structures have been defined. Messy.
@@ -916,8 +918,10 @@ enum AndroidObject_state {
 
 /*typedef*/ struct CAudioPlayer_struct {
     IObject mObject;
-#ifdef ANDROID
+#if defined(ANDROID)
 #define INTERFACES_AudioPlayer 29 // see MPH_to_AudioPlayer in MPH_to.c for list of interfaces
+#elif defined(ANDROID_EXT)
+#define INTERFACES_AudioPlayer 27 // see MPH_to_AudioPlayer in MPH_to.c for list of interfaces
 #else
 #define INTERFACES_AudioPlayer 26 // see MPH_to_AudioPlayer in MPH_to.c for list of interfaces
 #endif
@@ -940,6 +944,8 @@ enum AndroidObject_state {
 #ifdef ANDROID
     IAndroidEffect mAndroidEffect;
     IAndroidEffectSend mAndroidEffectSend;
+#endif
+#ifdef ANDROID_EXT
     IAndroidConfiguration mAndroidConfiguration;
 #endif
     // optional interfaces
