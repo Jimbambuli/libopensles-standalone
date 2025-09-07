@@ -45,7 +45,8 @@ libopensles = shared_library(
 		'-Wno-multichar',
 		'-Wno-implicit-fallthrough',
 		'-Wno-type-limits',
-		'-Wno-unused-parameter'
+		'-Wno-unused-parameter',
+		'-std=gnu23'
 	],
 	install: true,
 )

@@ -34,16 +34,6 @@
 #include <unistd.h> // usleep
 #include <errno.h>
 
-#ifndef __cplusplus
-typedef int bool;
-#ifndef false
-#define false 0
-#endif
-#ifndef true
-#define true 1
-#endif
-#endif
-
 // The OpenSLES.h definitions of SL_PROFILES_... have casts, so are unusable by preprocessor
 #define USE_PROFILES_PHONE    0x1   // == SL_PROFILES_PHONE
 #define USE_PROFILES_MUSIC    0x2   // == SL_PROFILES_MUSIC
