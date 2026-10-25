@@ -99,7 +99,7 @@ const signed char MPH_to_AudioRecorder[MPH_MAX] = {
     [MPH_EQUALIZER] = 6,
     [MPH_VISUALIZATION] = 7,
     [MPH_VOLUME] = 8,
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     [MPH_ANDROIDSIMPLEBUFFERQUEUE] = 9, // this is not an alias
     [MPH_ANDROIDCONFIGURATION] = 10
 #endif

@@ -29,12 +29,29 @@ static SLresult IRecord_SetRecordState(SLRecordItf self, SLuint32 state)
     case SL_RECORDSTATE_RECORDING:
         {
         IRecord *this = (IRecord *) self;
+#ifdef USE_SDL
+        CAudioRecorder *audioRecorder = InterfaceToCAudioRecorder(this);
+        interface_lock_exclusive(this);
+        SLuint32 oldState = this->mState;
+        this->mState = state;
+        if ((SL_RECORDSTATE_RECORDING == state) &&
+                (SL_RECORDSTATE_STOPPED == oldState)) {
+            audioRecorder->mFramesRecorded = 0;
+            audioRecorder->mFramesSincePositionUpdate = 0;
+            audioRecorder->mMarkerReached = SL_BOOLEAN_FALSE;
+            audioRecorder->mHeadStalled = SL_BOOLEAN_FALSE;
+            this->mPosition = 0;
+        }
+        interface_unlock_exclusive(this);
+        SDL_pauseRecorder(audioRecorder);
+#else
         interface_lock_poke(this);
         this->mState = state;
 #ifdef ANDROID
         android_audioRecorder_setRecordState(InterfaceToCAudioRecorder(this), state);
 #endif
         interface_unlock_poke(this);
+#endif
         result = SL_RESULT_SUCCESS;
         }
         break;
@@ -184,6 +201,9 @@ static SLresult IRecord_SetMarkerPosition(SLRecordItf self, SLmillisecond mSec)
     interface_lock_exclusive(this);
     if (this->mMarkerPosition != mSec) {
         this->mMarkerPosition = mSec;
+#ifdef USE_SDL
+        InterfaceToCAudioRecorder(this)->mMarkerReached = SL_BOOLEAN_FALSE;
+#endif
         interface_unlock_exclusive_attributes(this, ATTR_TRANSPORT);
     } else {
         interface_unlock_exclusive(this);
@@ -202,6 +222,9 @@ static SLresult IRecord_ClearMarkerPosition(SLRecordItf self)
     interface_lock_exclusive(this);
     if (this->mMarkerPosition != 0) {
         this->mMarkerPosition = 0;
+#ifdef USE_SDL
+        InterfaceToCAudioRecorder(this)->mMarkerReached = SL_BOOLEAN_FALSE;
+#endif
         interface_unlock_exclusive_attributes(this, ATTR_TRANSPORT);
     } else {
         interface_unlock_exclusive(this);
@@ -242,6 +265,9 @@ static SLresult IRecord_SetPositionUpdatePeriod(SLRecordItf self, SLmillisecond 
         interface_lock_exclusive(this);
         if (this->mPositionUpdatePeriod != mSec) {
             this->mPositionUpdatePeriod = mSec;
+#ifdef USE_SDL
+            InterfaceToCAudioRecorder(this)->mFramesSincePositionUpdate = 0;
+#endif
             interface_unlock_exclusive_attributes(this, ATTR_TRANSPORT);
         } else {
             interface_unlock_exclusive(this);

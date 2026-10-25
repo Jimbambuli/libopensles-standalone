@@ -21,6 +21,8 @@ implementation, afaict anyway
 player's sample rate and channel count, so players with different formats can
 play at the same time
 
+- the SDL backend support for AudioRecorder added
+
 - meson.build files added which facilitate building for non-android platforms
 (tested on Linux) - google doesn't specify how to compile for non-android
 platforms, they just mention that it's a thing

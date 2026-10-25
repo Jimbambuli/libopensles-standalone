@@ -294,6 +294,9 @@ static SLresult IEngine_CreateAudioRecorder(SLEngineItf self, SLObjectItf *pReco
                     this->mAudioRecord = NULL;
                     this->mRecordSource = android::AUDIO_SOURCE_DEFAULT;
 #endif
+#ifdef USE_SDL
+                    this->mAudioDevice = 0;
+#endif
 
                     // Check the source and sink parameters, and make a local copy of all parameters
                     result = checkDataSource(pAudioSrc, &this->mDataSource);
@@ -318,7 +321,15 @@ static SLresult IEngine_CreateAudioRecorder(SLEngineItf self, SLObjectItf *pReco
                     }
 #endif
 
-#ifdef ANDROID
+#ifdef USE_SDL
+                    result = SDL_checkAudioRecorderSourceSink(this);
+                    if (SL_RESULT_SUCCESS != result) {
+                        SL_LOGE("Cannot create AudioRecorder: invalid source or sink");
+                        break;
+                    }
+#endif
+
+#if defined(ANDROID) || defined(USE_SDL)
                     // Allocate memory for buffer queue
                     SLuint32 locatorType = this->mDataSink.mLocator.mLocatorType;
                     if (locatorType == SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE) {

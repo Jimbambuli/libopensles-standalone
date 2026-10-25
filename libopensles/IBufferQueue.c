@@ -43,6 +43,18 @@ static SLuint32 getAssociatedState(IBufferQueue *this)
 }
 
 
+static void IBufferQueue_reset(IBufferQueue *this)
+{
+    this->mFront = &this->mArray[0];
+    this->mRear = &this->mArray[0];
+    this->mState.count = 0;
+    this->mState.playIndex = 0;
+#if defined(ANDROID) || defined(USE_SDL)
+    this->mSizeConsumed = 0;
+#endif
+}
+
+
 SLresult IBufferQueue_Enqueue(SLBufferQueueItf self, const void *pBuffer, SLuint32 size)
 {
     SL_ENTER_INTERFACE
@@ -101,12 +113,18 @@ SLresult IBufferQueue_Clear(SLBufferQueueItf self)
 #endif
 
 #if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
-    // mixer might be reading from the front buffer, so tread carefully here
-    // NTH asynchronous cancel instead of blocking until mixer acknowledges
-    this->mClearRequested = SL_BOOLEAN_TRUE;
-    do {
-        interface_cond_wait(this);
-    } while (this->mClearRequested);
+    if (SL_OBJECTID_AUDIORECORDER == InterfaceToObjectID(this)) {
+        // The capture callback re-reads the queue state after releasing the object lock, and
+        // waiting here would deadlock if the application called Clear from a queue callback.
+        IBufferQueue_reset(this);
+    } else {
+        // mixer might be reading from the front buffer, so tread carefully here
+        // NTH asynchronous cancel instead of blocking until mixer acknowledges
+        this->mClearRequested = SL_BOOLEAN_TRUE;
+        do {
+            interface_cond_wait(this);
+        } while (this->mClearRequested);
+    }
 #endif
 
     interface_unlock_exclusive(this);
@@ -184,7 +202,7 @@ void IBufferQueue_init(void *self)
     this->mArray = NULL;
     this->mFront = NULL;
     this->mRear = NULL;
-#ifdef ANDROID
+#if defined(ANDROID) || defined(USE_SDL)
     this->mSizeConsumed = 0;
 #endif
     BufferHeader *bufferHeader = this->mTypical;

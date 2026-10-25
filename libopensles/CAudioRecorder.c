@@ -30,6 +30,12 @@ SLresult CAudioRecorder_Realize(void *self, SLboolean async)
     result = android_audioRecorder_realize(this, async);
 #endif
 
+#ifdef USE_SDL
+    if (SL_RESULT_SUCCESS == result) {
+        result = SDL_openRecorder((CAudioRecorder *) self);
+    }
+#endif
+
     return result;
 }
 
@@ -49,8 +55,10 @@ void CAudioRecorder_Destroy(void *self)
     CAudioRecorder *this = (CAudioRecorder *) self;
     freeDataLocatorFormat(&this->mDataSource);
     freeDataLocatorFormat(&this->mDataSink);
-#ifdef ANDROID
+#if defined(ANDROID) || defined(USE_SDL)
     IBufferQueue_Destroy(&this->mBufferQueue);
+#endif
+#ifdef ANDROID
     android_audioRecorder_destroy(this);
 #endif
 }
@@ -60,5 +68,13 @@ void CAudioRecorder_Destroy(void *self)
 
 bool CAudioRecorder_PreDestroy(void *self)
 {
+#ifdef USE_SDL
+    CAudioRecorder *this = (CAudioRecorder *) self;
+    if (0 != this->mAudioDevice) {
+        object_unlock_exclusive(&this->mObject);
+        SDL_closeRecorder(this);
+        object_lock_exclusive(&this->mObject);
+    }
+#endif
     return true;
 }

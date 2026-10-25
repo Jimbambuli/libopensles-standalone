@@ -478,7 +478,7 @@ typedef struct BufferQueue_interface {
     /*SLboolean*/ SLuint16 mClearRequested;
     BufferHeader *mArray;
     BufferHeader *mFront, *mRear;
-#ifdef ANDROID
+#if defined(ANDROID) || defined(USE_SDL)
     SLuint32 mSizeConsumed;
 #endif
     // saves a malloc in the typical case
@@ -1012,7 +1012,7 @@ enum AndroidObject_state {
 /*typedef*/ struct CAudioRecorder_struct {
     // mandated interfaces
     IObject mObject;
-#ifdef ANDROID
+#ifdef ANDROID_EXT
 #define INTERFACES_AudioRecorder 11 // see MPH_to_AudioRecorder in MPH_to.c for list of interfaces
 #else
 #define INTERFACES_AudioRecorder 9  // see MPH_to_AudioRecorder in MPH_to.c for list of interfaces
@@ -1027,7 +1027,7 @@ enum AndroidObject_state {
     IEqualizer mEqualizer;
     IVisualization mVisualization;
     IVolume mVolume;
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     IBufferQueue mBufferQueue;
     IAndroidConfiguration mAndroidConfiguration;
 #endif
@@ -1041,6 +1041,13 @@ enum AndroidObject_state {
 #ifdef ANDROID
     android::AudioRecord *mAudioRecord;
     int mRecordSource;
+#endif
+#ifdef USE_SDL
+    SDL_AudioDeviceID mAudioDevice; ///< SDL capture device dedicated to this audio recorder
+    uint64_t mFramesRecorded;       ///< Frames captured since recording started
+    SLuint32 mFramesSincePositionUpdate;
+    SLboolean mMarkerReached;
+    SLboolean mHeadStalled;
 #endif
 } /*CAudioRecorder*/;
 
@@ -1257,6 +1264,10 @@ extern SLresult SDL_open(CAudioPlayer *audioPlayer);
 extern void SDL_close(CAudioPlayer *audioPlayer);
 extern SLresult SDL_checkAudioPlayerSourceSink(CAudioPlayer *this);
 extern void audioPlayerGainUpdate(CAudioPlayer *audioPlayer);
+extern SLresult SDL_openRecorder(CAudioRecorder *audioRecorder);
+extern void SDL_closeRecorder(CAudioRecorder *audioRecorder);
+extern SLresult SDL_checkAudioRecorderSourceSink(CAudioRecorder *this);
+extern void SDL_pauseRecorder(CAudioRecorder *audioRecorder);
 #endif
 #define SL_OBJECT_STATE_REALIZING_1  ((SLuint32) 0x4) // async realize on work queue
 #define SL_OBJECT_STATE_REALIZING_2  ((SLuint32) 0x5) // sync realize, or async realize hook

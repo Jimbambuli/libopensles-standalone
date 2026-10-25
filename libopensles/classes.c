@@ -127,7 +127,7 @@ static const struct iid_vtable AudioRecorder_interfaces[INTERFACES_AudioRecorder
     {MPH_EQUALIZER, INTERFACE_DYNAMIC_OPTIONAL, offsetof(CAudioRecorder, mEqualizer)},
     {MPH_VISUALIZATION, INTERFACE_OPTIONAL, offsetof(CAudioRecorder, mVisualization)},
     {MPH_VOLUME, INTERFACE_OPTIONAL, offsetof(CAudioRecorder, mVolume)},
-#ifdef ANDROID
+#ifdef ANDROID_EXT
     {MPH_ANDROIDSIMPLEBUFFERQUEUE, INTERFACE_EXPLICIT, offsetof(CAudioRecorder, mBufferQueue)},
     {MPH_ANDROIDCONFIGURATION, INTERFACE_EXPLICIT_PREREALIZE,
             offsetof(CAudioRecorder, mAndroidConfiguration)},
