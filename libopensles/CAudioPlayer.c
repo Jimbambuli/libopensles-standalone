@@ -38,6 +38,12 @@ SLresult CAudioPlayer_Realize(void *self, SLboolean async)
     // depending on the data source and the platform implementation.
     // If they are unknown here, then they will be determined during prefetch.
 
+#ifdef USE_SDL
+    if (SL_RESULT_SUCCESS == result) {
+        result = SDL_open(this);
+    }
+#endif
+
     return result;
 }
 
@@ -87,6 +93,15 @@ bool CAudioPlayer_PreDestroy(void *self)
         object_cond_wait(self);
     }
     // Mixer thread has acknowledged the request
+#elif defined(USE_SDL)
+    CAudioPlayer *this = (CAudioPlayer *) self;
+    if (0 != this->mAudioDevice) {
+        // Closing the SDL device waits for any in-flight callback to finish, so the
+        // object lock must not be held while doing it.
+        object_unlock_exclusive(&this->mObject);
+        SDL_close(this);
+        object_lock_exclusive(&this->mObject);
+    }
 #endif
     return true;
 }

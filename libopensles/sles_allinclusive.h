@@ -530,7 +530,7 @@ typedef struct Engine_interface {
     const struct SLEngineItf_ *mItf;
     IObject *mThis;
     SLboolean mLossOfControlGlobal;
-#ifdef USE_SDL
+#ifdef USE_OUTPUTMIXEXT
     COutputMix *mOutputMix; // SDL pulls PCM from an arbitrary IOutputMixExt
 #endif
     // Each engine is its own universe.
@@ -715,7 +715,7 @@ typedef struct Play_interface {
     // the ISeek trick of using a distinct value doesn't work here because it's readable by app
     SLmillisecond mMarkerPosition;
     SLmillisecond mPositionUpdatePeriod; // Zero means do not do position updates (FIXME ~0)
-#ifdef USE_OUTPUTMIXEXT
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
     SLuint32 mFrameUpdatePeriod;         // mPositionUpdatePeriod in frame units
     SLmillisecond mLastSeekPosition;     // Last known accurate position, set at Seek
     SLuint32 mFramesSinceLastSeek;       // Frames mixed since last known accurate position
@@ -965,10 +965,17 @@ enum AndroidObject_state {
      */
     SLmillibel mDirectLevel;
     // implementation-specific data for this instance
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
+    float mGains[STEREO_CHANNELS];  ///< Computed gain based on volume, mute, solo, stereo position
+#endif
 #ifdef USE_OUTPUTMIXEXT
     Track *mTrack;
-    float mGains[STEREO_CHANNELS];  ///< Computed gain based on volume, mute, solo, stereo position
     SLboolean mDestroyRequested;    ///< Mixer to acknowledge application's call to Object::Destroy
+#endif
+#ifdef USE_SDL
+    SDL_AudioDeviceID mAudioDevice; ///< SDL device dedicated to this audio player
+    const void *mReader;            ///< Pointer to next frame in the current buffer
+    SLuint32 mAvail;                ///< Number of available bytes in the current buffer
 #endif
 #ifdef USE_SNDFILE
     struct SndFile mSndFile;
@@ -1246,8 +1253,10 @@ extern void COutputMix_Destroy(void *self);
 extern bool COutputMix_PreDestroy(void *self);
 
 #ifdef USE_SDL
-extern void SDL_open(IEngine *thisEngine);
-extern void SDL_close(void);
+extern SLresult SDL_open(CAudioPlayer *audioPlayer);
+extern void SDL_close(CAudioPlayer *audioPlayer);
+extern SLresult SDL_checkAudioPlayerSourceSink(CAudioPlayer *this);
+extern void audioPlayerGainUpdate(CAudioPlayer *audioPlayer);
 #endif
 #define SL_OBJECT_STATE_REALIZING_1  ((SLuint32) 0x4) // async realize on work queue
 #define SL_OBJECT_STATE_REALIZING_2  ((SLuint32) 0x5) // sync realize, or async realize hook

@@ -93,6 +93,17 @@ static SLresult IPlay_SetPlayState(SLPlayItf self, SLuint32 state)
         // Here life looks easy for an Android, but there are other troubles in play land
         this->mState = state;
         attr = ATTR_TRANSPORT;
+#ifdef USE_SDL
+        if ((NULL != audioPlayer) && (SL_PLAYSTATE_STOPPED == state)) {
+            audioPlayer->mPlay.mPosition = 0;
+            audioPlayer->mPlay.mFramesSinceLastSeek = 0;
+            audioPlayer->mPlay.mFramesSincePositionUpdate = 0;
+            audioPlayer->mPlay.mLastSeekPosition = 0;
+            audioPlayer->mReader = NULL;
+            audioPlayer->mAvail = 0;
+            audioPlayer->mSeek.mPos = SL_TIME_UNKNOWN;
+        }
+#endif
 #endif
         interface_unlock_exclusive_attributes(this, attr);
         }
@@ -241,7 +252,7 @@ static SLresult IPlay_SetCallbackEventsMask(SLPlayItf self, SLuint32 eventFlags)
         IPlay *this = (IPlay *) self;
         interface_lock_exclusive(this);
         if (this->mEventFlags != eventFlags) {
-#ifdef USE_OUTPUTMIXEXT
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
             // enabling the "head at new position" play event will postpone the next update event
             if (!(this->mEventFlags & SL_PLAYEVENT_HEADATNEWPOS) &&
                     (eventFlags & SL_PLAYEVENT_HEADATNEWPOS)) {
@@ -349,7 +360,7 @@ static SLresult IPlay_SetPositionUpdatePeriod(SLPlayItf self, SLmillisecond mSec
                 // result = android_audioPlayer_useEventMask(this, this->mEventFlags);
             }
 #endif
-#ifdef USE_OUTPUTMIXEXT
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
             if (SL_OBJECTID_AUDIOPLAYER == InterfaceToObjectID(this)) {
                 CAudioPlayer *audioPlayer = (CAudioPlayer *) this->mThis;
                 SLuint32 frameUpdatePeriod = ((long long) mSec *
@@ -417,7 +428,7 @@ void IPlay_init(void *self)
     this->mEventFlags = 0;
     this->mMarkerPosition = 0;
     this->mPositionUpdatePeriod = 1000;
-#ifdef USE_OUTPUTMIXEXT
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
     this->mFrameUpdatePeriod = 0;   // because we don't know the sample rate yet
     this->mLastSeekPosition = 0;
     this->mFramesSinceLastSeek = 0;

@@ -259,7 +259,7 @@ SLresult SndFile_Realize(CAudioPlayer *this)
                 1000LL) / this->mSndFile.mSfInfo.samplerate);
             this->mNumChannels = this->mSndFile.mSfInfo.channels;
             this->mSampleRateMilliHz = this->mSndFile.mSfInfo.samplerate * 1000;
-#ifdef USE_OUTPUTMIXEXT
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
             this->mPlay.mFrameUpdatePeriod = ((long long) this->mPlay.mPositionUpdatePeriod *
                 (long long) this->mSampleRateMilliHz) / 1000000LL;
 #endif

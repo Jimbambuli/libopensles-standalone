@@ -36,9 +36,6 @@ SLresult CEngine_Realize(void *self, SLboolean async)
         (void) pthread_join(this->mSyncThread, (void **) NULL);
         return result;
     }
-#ifdef USE_SDL
-    SDL_open(&this->mEngine);
-#endif
     return SL_RESULT_SUCCESS;
 }
 
@@ -106,10 +103,6 @@ void CEngine_Destroy(void *self)
     if (NULL != this->mAndroidEffectCapabilities.mFxDescriptors) {
         delete [] this->mAndroidEffectCapabilities.mFxDescriptors;
     }
-#endif
-
-#ifdef USE_SDL
-    SDL_close();
 #endif
 
 }

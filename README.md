@@ -17,11 +17,9 @@ any apps using the OpenSLES API are expected to assume they're running
 on android, since there isn't any other (perhaps compliant) OpenSLES
 implementation, afaict anyway
 
-- to partially work around the fact that the SDL backend doesn't include any
-mechanism for sample rate conversion, the `SLES_SDL_FREQ` env is introduced
-so that a user can manually specify the correct sample rate for cases where
-only one sample rate is ever used by an app, but it's not the default
-of 44100kHz
+- the SDL backend gives each AudioPlayer its own SDL audio device, using the
+player's sample rate and channel count, so players with different formats can
+play at the same time
 
 - meson.build files added which facilitate building for non-android platforms
 (tested on Linux) - google doesn't specify how to compile for non-android
@@ -38,8 +36,6 @@ to lower the amount of code changes needed for adding Linux support to applicati
 for android but having near zero dependency on anything Java.
 
 ##### TODO:
-
-- add support for sample rate conversion to the SDL backend
 
 - decouple other android extensions whenever there is an opportunity to test them with a real world
 application

@@ -100,7 +100,7 @@ SLresult IBufferQueue_Clear(SLBufferQueueItf self)
     }
 #endif
 
-#ifdef USE_OUTPUTMIXEXT
+#if defined(USE_OUTPUTMIXEXT) || defined(USE_SDL)
     // mixer might be reading from the front buffer, so tread carefully here
     // NTH asynchronous cancel instead of blocking until mixer acknowledges
     this->mClearRequested = SL_BOOLEAN_TRUE;

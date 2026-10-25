@@ -36,7 +36,6 @@ libopensles_files = files([
 	'CAudioRecorder.c',
 	'CEngine.c',
 	'COutputMix.c',
-	'IOutputMixExt.c',
 	'IAndroidConfiguration.c',
 	'IBassBoost.c',
 	'IBufferQueue.c',

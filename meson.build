@@ -35,7 +35,6 @@ libopensles = shared_library(
 		'-DUSE_LOG=SLAndroidLogLevel_Verbose', # debug
 		'-DSLAPIENTRY=__attribute__((visibility("default")))', # since we use `gnu_symbol_visibility: 'hidden'`, we need to explicity export the functions which constitute the API
 		'-DUSE_SDL', # the backend of choice for non-android builds (probably not ideal? but seems to somewhat work)
-		'-DUSE_OUTPUTMIXEXT', # used by the SDL backend
 		'-DANDROID_SIMULATOR', # not sure, but sounds like something we want
 		'-DUSE_SNDFILE', # used by the SDL backend
 		'-DUSE_BACKPORT', # gets rid of dependencies on some stuff from AOSP
