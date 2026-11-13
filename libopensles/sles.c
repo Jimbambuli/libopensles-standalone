@@ -609,6 +609,30 @@ static SLresult checkDataFormat(void *pFormat, DataFormat *pDataFormat)
             } while(0);
             break;
 
+#ifdef ANDROID_EXT
+        /* Android's extended PCM format (API 21): 16-bit signed integers become SL_DATAFORMAT_PCM; 32-bit float is
+         * kept as SL_DATAFORMAT_PCM with 32 bits per sample, which plain SL_DATAFORMAT_PCM cannot have, so 32 bits
+         * means float from here on (the SDL backend plays it as such); other representations are unsupported */
+        case SL_ANDROID_DATAFORMAT_PCM_EX: {
+            const SLAndroidDataFormat_PCM_EX *ex = (const SLAndroidDataFormat_PCM_EX *) pFormat;
+            SLDataFormat_PCM pcm = {SL_DATAFORMAT_PCM, ex->numChannels, ex->sampleRate, ex->bitsPerSample,
+                ex->containerSize, ex->channelMask, ex->endianness};
+            if (SL_ANDROID_PCM_REPRESENTATION_FLOAT == ex->representation && 32 == ex->bitsPerSample &&
+                    32 == ex->containerSize) {
+                pcm.bitsPerSample = pcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
+                result = checkDataFormat(&pcm, pDataFormat);
+                pDataFormat->mPCM.bitsPerSample = pDataFormat->mPCM.containerSize = SL_PCMSAMPLEFORMAT_FIXED_32;
+            } else if (SL_ANDROID_PCM_REPRESENTATION_SIGNED_INT == ex->representation && 16 == ex->bitsPerSample) {
+                result = checkDataFormat(&pcm, pDataFormat);
+            } else {
+                SL_LOGE("PCM_EX representation=%u bitsPerSample=%u", (unsigned) ex->representation,
+                    (unsigned) ex->bitsPerSample);
+                result = SL_RESULT_CONTENT_UNSUPPORTED;
+            }
+            return result;
+        }
+#endif
+
         case SL_DATAFORMAT_MIME:
             pDataFormat->mMIME = *(SLDataFormat_MIME *)pFormat;
             if (NULL != pDataFormat->mMIME.mimeType) {

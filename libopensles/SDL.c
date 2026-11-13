@@ -32,6 +32,25 @@ static void SDL_mix(const short *source, short *destination, SLuint32 size,
 }
 
 
+/** \brief Like SDL_mix() for float samples (SL_ANDROID_DATAFORMAT_PCM_EX, see checkDataFormat()) */
+
+static void SDL_mix_float(const float *source, float *destination, SLuint32 size,
+    SLuint32 channels, const float *gains)
+{
+    for (SLuint32 i = 0; i < size / sizeof(float); ++i) {
+        SLuint32 channel = i % channels;
+        float gain = channel < STEREO_CHANNELS ? gains[channel] : 1.0f;
+        destination[i] = source[i] * gain;
+    }
+}
+
+static SLboolean SDL_isFloat(const CAudioPlayer *audioPlayer)
+{
+    return SL_DATAFORMAT_PCM == audioPlayer->mDataSource.mFormat.mFormatType &&
+        SL_PCMSAMPLEFORMAT_FIXED_32 == audioPlayer->mDataSource.mFormat.mPCM.bitsPerSample;
+}
+
+
 /** \brief Called by SDL to fill the next audio output buffer for one audio player */
 
 static void SDLCALL SDL_callback(void *context, Uint8 *stream, int len)
@@ -42,7 +61,8 @@ static void SDLCALL SDL_callback(void *context, Uint8 *stream, int len)
     Uint8 *destination = stream;
     SLuint32 remaining = (SLuint32) len;
     SLuint32 channels = audioPlayer->mNumChannels;
-    SLuint32 frameSize = channels * sizeof(short);
+    SLboolean isFloat = SDL_isFloat(audioPlayer);
+    SLuint32 frameSize = channels * (isFloat ? sizeof(float) : sizeof(short));
     if (remaining >= frameSize) {
         remaining -= remaining % frameSize;
     } else {
@@ -91,8 +111,12 @@ static void SDLCALL SDL_callback(void *context, Uint8 *stream, int len)
         actual -= actual % frameSize;
 
         if (0 < actual) {
-            SDL_mix((const short *) audioPlayer->mReader, (short *) destination,
-                actual, channels, audioPlayer->mGains);
+            if (isFloat)
+                SDL_mix_float((const float *) audioPlayer->mReader, (float *) destination,
+                    actual, channels, audioPlayer->mGains);
+            else
+                SDL_mix((const short *) audioPlayer->mReader, (short *) destination,
+                    actual, channels, audioPlayer->mGains);
             destination += actual;
             remaining -= actual;
             audioPlayer->mReader = (const char *) audioPlayer->mReader + actual;
@@ -100,6 +124,14 @@ static void SDLCALL SDL_callback(void *context, Uint8 *stream, int len)
             SLuint32 frames = actual / frameSize;
             audioPlayer->mPlay.mFramesSinceLastSeek += frames;
             audioPlayer->mPlay.mFramesSincePositionUpdate += frames;
+            // the position GetPosition() reports, as SndFile.c keeps it for URI players (otherwise it stays 0, and
+            // a player that takes its clock from it, like cubeb for Firefox's audio and video, never moves on)
+            SLuint32 sampleRateMilliHz = audioPlayer->mSampleRateMilliHz;
+            if (0 != sampleRateMilliHz) {
+                audioPlayer->mPlay.mPosition = (SLmillisecond) (((long long)
+                    audioPlayer->mPlay.mFramesSinceLastSeek * 1000000LL) / sampleRateMilliHz) +
+                    audioPlayer->mPlay.mLastSeekPosition;
+            }
         } else {
             // discard a remainder that is smaller than one frame
             audioPlayer->mReader = (const char *) audioPlayer->mReader + audioPlayer->mAvail;
@@ -150,7 +182,7 @@ SLresult SDL_open(CAudioPlayer *audioPlayer)
     SDL_AudioSpec fmt;
     SDL_zero(fmt);
     fmt.freq = audioPlayer->mSampleRateMilliHz / 1000;
-    fmt.format = AUDIO_S16;
+    fmt.format = SDL_isFloat(audioPlayer) ? AUDIO_F32 : AUDIO_S16;
     fmt.channels = audioPlayer->mNumChannels;
 #ifdef _WIN32 // FIXME Either a bug or a serious misunderstanding
     fmt.samples = SndFile_BUFSIZE;
