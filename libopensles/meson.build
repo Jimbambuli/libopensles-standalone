@@ -45,6 +45,7 @@ libopensles_files = files([
 	'IEqualizer.c',
 	'IMuteSolo.c',
 	'IObject.c',
+	'IOutputMix.c',
 	'IPlay.c',
 	'IPlaybackRate.c',
 	'IPrefetchStatus.c',

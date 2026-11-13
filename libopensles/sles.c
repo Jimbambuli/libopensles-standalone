@@ -919,7 +919,6 @@ extern void
 #define IDeviceVolume_init               NULL
 #define IDynamicInterfaceManagement_init NULL
 #define IEngineCapabilities_init         NULL
-#define IOutputMix_init                  NULL
 #define IThreadSync_init                 NULL
 #endif
 
