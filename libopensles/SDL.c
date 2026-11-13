@@ -203,6 +203,9 @@ SLresult SDL_open(CAudioPlayer *audioPlayer)
     audioPlayer->mAvail = 0;
     audioPlayer->mGains[0] = 1.0f;
     audioPlayer->mGains[1] = 1.0f;
+    // ISeek_init() only runs when the application asked for SL_IID_SEEK; otherwise mSeek.mPos stays 0 from calloc()
+    // and IPlay_GetPosition() reports that "pending seek" forever (cubeb, Firefox's audio clock: video never advances)
+    audioPlayer->mSeek.mPos = SL_TIME_UNKNOWN;
 
     // The callback runs even while the player is stopped so that buffer queue clear
     // and player destroy requests can always be acknowledged.
